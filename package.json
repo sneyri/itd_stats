@@ -1,0 +1,15 @@
+{
+  "name": "itd_notifications",
+  "version": "1.0.0",
+  "description": "Утилита для получение определенных уведомлений с сайта итд.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "itd-sdk-js": "^1.2.1"
+  }
+}
