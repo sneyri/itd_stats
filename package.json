@@ -4,12 +4,14 @@
   "description": "Утилита для получение определенных уведомлений с сайта итд.com",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./index.js"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^17.4.2",
     "itd-sdk-js": "^1.2.1"
   }
 }

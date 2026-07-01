@@ -1,1 +1,3 @@
-console.log('Проект создан!');
+import notifications from "./notifications.js"
+
+notifications();
