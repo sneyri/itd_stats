@@ -18,6 +18,8 @@ export default async function notifications() {
 
     while (hasMore) {
         const result = await client.getNotifications(limit, offset);
+
+        if (!result && !result.notifications) return;
         const notifications = result.notifications;
 
         for (let notify of notifications) {
