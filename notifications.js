@@ -1,25 +1,30 @@
-import checkVerify from "./utils.js"
+import checkVerify from "./utils.js";
 import fs from "fs";
 import client from "./client.js";
 
-// чуть чуть нейроночкой красиво сделал(
+// Тут я через ИИшку сделал красивые уведомления, в падлу было самому. Вайбкод круглый год
 
 export default async function notifications() {
-    const header = `
-# УВЕДОМЛЕНИЯ ОТ ВЕРИФИЦИРОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ
-
----
-`;
+    const header = `# Уведомления от верифицированных пользователей\n\n`;
     let content = header;
     let limit = 1000;
     let offset = 0;
     let hasMore = true;
     let totalCount = 0;
 
+    const typeDescriptions = {
+        'like': 'лайкнул(а) ваш пост',
+        'comment': 'прокомментировал(а) ваш пост',
+        'repost': 'репостнул(а) ваш пост',
+        'mention': 'упомянул(а) вас',
+        'follow': 'подписался(ась) на вас',
+        'reply': 'ответил(а) вам',
+    };
+
     while (hasMore) {
         const result = await client.getNotifications(limit, offset);
 
-        if (!result && !result.notifications) return;
+        if (!result || !result.notifications) return;
         const notifications = result.notifications;
 
         for (let notify of notifications) {
@@ -28,6 +33,7 @@ export default async function notifications() {
 
             if (checkVerify(username)) {
                 totalCount++;
+
                 const date = new Date(notify.createdAt).toLocaleString('ru-RU', {
                     day: '2-digit',
                     month: '2-digit',
@@ -41,26 +47,15 @@ export default async function notifications() {
                     preview = preview.slice(0, 150) + '...';
                 }
 
-                const typeEmoji = {
-                    'like': '❤️',
-                    'comment': '💬',
-                    'repost': '🔄',
-                    'mention': '👤',
-                    'follow': '➕'
-                };
-
-                const emoji = typeEmoji[notify.type] || '📌';
+                const action = typeDescriptions[notify.type] || notify.type;
 
                 content += `
-### ${emoji} ${notify.type.toUpperCase()}
+@${username} ${action}
 
-**Пользователь:** @${username})
-**Дата:** ${date}
+📅 **Дата:** ${date}
+📝 **Текст:** ${preview}
 
-> ${preview}
-
----
-`;
+---`;
             }
         }
 
@@ -68,16 +63,20 @@ export default async function notifications() {
         hasMore = result.hasMore;
     }
 
-    const footer = `
+    content += `
 
 ## Статистика
-**Всего уведомлений:** ${totalCount}
+👥 **Всего уведомлений от верифицированных пользователей:** ${totalCount}
 
 ---
-*Отчёт сгенерирован ${new Date().toLocaleString('ru-RU')}*
-`;
+📊 Отчёт сгенерирован ${new Date().toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })}`;
 
-    content += footer;
-
+    // Сохраняем результат
     fs.writeFileSync('./Stats/Notifications.md', content);
 }
